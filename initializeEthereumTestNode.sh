@@ -31,202 +31,12 @@ set -e;
 CLIENT_NODE_TYPE="CLIENT";
 ROOT_NODE_TYPE="ROOT";
 
-
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-#
-#    Utility Functions
-#
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
 USER_VARS_FILE_NAME="${HOME}/.userVars.sh";
 
-declare -A SHELLVARS;
-declare SHELLVARNAMES=();
+source ./utils/utilities.sh
+source ./utils/manageShellVars.sh
 
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-#  addShellVar -- add a definition to the list of required shell variables
-#
-function addShellVar() {
-
-  declare -A SHELLVAR;
-
-  SHELLVARNAMES+=($1);
-  SHELLVAR['LONG']=$2;
-  SHELLVAR['SHORT']=$3;
-  SHELLVAR['VAL']=$4;
-  for key in "${!SHELLVAR[@]}"; do
-    SHELLVARS[$1,$key]=${SHELLVAR[$key]}
-  done
-
-};
-
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-#  Build shell variables definitions
-#
-# PREPARE ALL NEEDED SHELL VARIABLES BELOW THIS LINE
-# EXAMPLE
-# addShellVar 'NAME' \
-#             'LONG' \
-#             'SHORT' \
-#             'VAL';
-
-
-addShellVar 'NETWORK_ID' \
-            'The number you will use to identify your network :: ' \
-            'Network Identification number (--networkid) : ${NETWORK_ID} ' \
-            '1';
-
-addShellVar 'ACCOUNT_PASSWORD' \
-            'The password to use when creating accounts :: ' \
-            'Accounts password : ${ACCOUNT_PASSWORD} ' \
-            '2';
-
-addShellVar 'NETWORK_ROOT_IP' \
-            'The IP address of your root node machine :: ' \
-            'Root node IP address : ${NETWORK_ROOT_IP} ' \
-            '3';
-
-addShellVar 'NETWORK_ROOT_UID' \
-            "The SSH user name of the root node machine's Ethereum account :: " \
-            'SSH user id of root node : ${NETWORK_ROOT_UID} ' \
-            '4';
-
-addShellVar 'DUMMY' \
-            " :: " \
-            ' : ${DUMMY} ' \
-            '5';
-
-
-addShellVar 'ROOT_PROJECT_DIR' \
-            "The directory for geth's working files ON THE ROOT NODE :: " \
-            'Project directory on root node : ${ROOT_PROJECT_DIR}' \
-            '6';
-
-
-addShellVar 'PROJECT_DIR' \
-            "The directory for geth's working files on THIS node :: " \
-            'Project directory on THIS node : ${PROJECT_DIR} ' \
-            '7';
-
-
-addShellVar 'NODE_INFO_FILE' \
-            'Name of the file for the "nodeInfo" of the root node :: ' \
-            'Name of nodeInfo file : ${NODE_INFO_FILE} ' \
-            '8';
-
-
-addShellVar 'DROP_DAGS' \
-            'You want to delete the DAG file (y/n) :: ' \
-            'Delete DAG file (y/n) : ${DROP_DAGS} ' \
-            '9';
-
-
-addShellVar 'DROP_BLOCKCHAIN' \
-            'You want to delete the block chain file (y/n) :: ' \
-            'Delete block chain (y/n) : ${DROP_BLOCKCHAIN}' \
-            '10';
-
-
-addShellVar 'DROP_CLIENTFILES' \
-            'You want to delete all the other client files (y/n) :: ' \
-            'Delete other client files (y/n) : ${DROP_CLIENTFILES}' \
-            '11';
-
-addShellVar 'NODE_TYPE' \
-            '' \
-            '' \
-            '12';
-
-
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-#  loadShellVars -- get shell variables from file, if exists
-#
-function loadShellVars() {
-
-  if [ -f ${USER_VARS_FILE_NAME} ]; then
-    source ${USER_VARS_FILE_NAME}
-  else
-
-    for varkey in "${!SHELLVARNAMES[@]}"; do
-      X=${SHELLVARNAMES[$varkey]};
-      SHELLVARS["${X},VAL"]=${!X};
-      eval "export ${SHELLVARNAMES[$varkey]}='${SHELLVARS[${SHELLVARNAMES[$varkey]},VAL]}'";
-    done
-
-  fi
-
-}
-
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-#  saveShellVars -- record shell variables to file
-#
-function saveShellVars()
-{
-
-  echo -e "Saving shell variables to $1";
-  echo -e "#/bin/bash\n#  You can edit this, but it may be altered progrmmatically." > $1;
-  for varkey in "${!SHELLVARNAMES[@]}"; do
-    X=${SHELLVARNAMES[$varkey]};
-    eval "echo \"export ${X}='${!X}';\"  >> $1;";
-  done
-
-  chown ${SUDOUSER}:${SUDOUSER} ${USER_VARS_FILE_NAME};
-
-}
-
-
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-#  askUserForParameters -- iterate a list of shell vars, prompting for setting
-#
-function askUserForParameters()
-{
-
-  declare -a VARS_TO_UPDATE=("${!1}");
-
-  CHOICE="n";
-  while [[ ! "X${CHOICE}X" == "XyX" ]]
-  do
-    ii=1;
-    for varkey in "${VARS_TO_UPDATE[@]}"; do
-      eval  "printf \"\n%+5s  %s\" $ii \"${SHELLVARS[${varkey},SHORT]}\"";
-#      eval   "echo $ii/. -- ${SHELLVARS[${varkey},SHORT]}";
-      ((ii++));
-    done;
-
-    echo -e "\n\n";
-
-    read -ep "Is this correct? (y/n/q) ::  " -n 1 -r USER_ANSWER
-#    USER_ANSWER='q';
-    CHOICE=$(echo ${USER_ANSWER:0:1} | tr '[:upper:]' '[:lower:]')
-    if [[ "X${CHOICE}X" == "XqX" ]]; then
-      echo "Skipping this operation."; exit 1;
-    elif [[ ! "X${CHOICE}X" == "XyX" ]]; then
-
-      for varkey in "${VARS_TO_UPDATE[@]}"; do
-        read -p "${SHELLVARS[${varkey},LONG]}" -e -i "${!varkey}" INPUT
-        if [ ! "X${INPUT}X" == "XX" ]; then eval "${varkey}=\"${INPUT}\""; fi;
-      done;
-
-    fi;
-    echo "  "
-  done;
-
-  saveShellVars ${USER_VARS_FILE_NAME};
-  return;
-
-};
-
-
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-#  aptNotYetInstalled -- check if installation is needed
-#
-function aptNotYetInstalled() {
-
-  set +e;
-  return $(dpkg-query -W --showformat='${Status}\n' $1 2>/dev/null | grep -c "install ok installed");
-  set -e;
-
-}
+source ./shellVarDefs.sh
 
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -251,17 +61,6 @@ CLIENT_PARMS=(
   "NODE_INFO_FILE" \
   );
 
-# echo ${COMMON_PARMS[@]};
-# echo ${CLEANER_PARMS[@]};
-# echo ${CLIENT_PARMS[@]};
-
-declare LOCAL_IP_ADDR=$(ifconfig | grep -Eo 'inet (addr:)?([0-9]*\.){3}[0-9]*' | grep -Eo '([0-9]*\.){3}[0-9]*' | grep -v '127.0.0.1');
-
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-#
-#      Problem domain functions
-#
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #  askUserForNodeType -- Ask which node type to build and get its parms list.
@@ -340,7 +139,7 @@ function installDependencies()
 
   if aptNotYetInstalled "ethereum"; then
 
-    sudo apt-get -y install software-properties-common wget;
+    sudo apt-get -y install software-properties-common;
     # # sudo add-apt-repository -y ppa:ethereum/ethereum;
     sudo add-apt-repository -y ppa:ethereum/ethereum-dev;
     sudo apt-get update;
@@ -363,6 +162,7 @@ function prepareWorkingFilesStructure()
   echo -e "\n ~~ Preparing work directories in ${WORK_DIR}." ;
 
   mkdir -p ${WORK_DIR}/geth;
+  mkdir -p ${WORK_DIR}/scripts;
 #  touch ${WORK_DIR}/geth/history;
   touch ${WORK_DIR}/prvWhsmn.log;
 
@@ -399,7 +199,7 @@ function selectivelyPurgeFilesAsRequested()
       rm -fr ${WORK_DIR}/geth/keystore/;
       rm -fr ${WORK_DIR}/geth/history;
       rm -fr ${WORK_DIR}/geth/nodekey;
-      rm -fr ${WORK_DIR}/Genesis.json;
+      rm -fr ${WORK_DIR}/${GENESIS_FILE};
       
       rm -fr ${WORK_DIR}/prvWhsmn.log;
       rm -fr ${WORK_DIR}/.pwd;
@@ -414,16 +214,13 @@ function selectivelyPurgeFilesAsRequested()
 
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-#  getUnconfiguredGenesisFile -- Get the unconfigured Genesis file
+#  addUnconfiguredGenesisFile -- Get the unconfigured Genesis file
 #
-function getUnconfiguredGenesisFile()
+function addUnconfiguredGenesisFile()
 {
 
-  echo -e "\n ~~ Get the unconfigured Genesis file"
-
-  declare ORGANIZATION="martinhbramwell";
-  declare GIST_UUID="18b80f8e1aef23e692246fa20d256a9f";
-  wget -nv -O ${WORK_DIR}/${GENESIS_FILE} https://gist.githubusercontent.com/${ORGANIZATION}/${GIST_UUID}/raw/${GENESIS_FILE};
+  echo -e "\n ~~ Copying an unconfigured Genesis file to the workspace";
+  cp ./js/${GENESIS_FILE} ${WORK_DIR};
 
 };
 
@@ -450,15 +247,26 @@ function getBaseAccount()
 {
 
   echo -e "\n ~~ Try to get base account";
-  CB=$(geth --datadir "${WORK_DIR}/geth" --networkid ${NETWORK_ID} --verbosity 0 --exec eth.accounts[0] console);
-  COINBASE=$(sed 's/^"\(.*\)"$/\1/' <<< ${CB});
-  # echo "Checking : ${COINBASE} )" ;
-  if [[ ${COINBASE} =~ ^"0x"[a-f0-9]{40}$ ]]; then
-    echo "( Coin base account found : ${COINBASE} )" ;
+  CB=$(geth --datadir "${WORK_DIR}/geth" --networkid ${NETWORK_ID} --verbosity 0 --exec eth.accounts[0] console 2> /tmp/err);
+  if [[ "$?" -gt "0" ]]; then
+
+    echo -e "\n$(</tmp/err).";
+    echo -e "      Is geth running already?  Quitting . . . ";
+    exit 1;
+
   else
-    echo "( No coin base account found. )" ;
-    COINBASE="";
+
+    COINBASE=$(sed 's/^"\(.*\)"$/\1/' <<< ${CB});
+    # echo "Checking : ${COINBASE} )" ;
+    if [[ ${COINBASE} =~ ^"0x"[a-f0-9]{40}$ ]]; then
+      echo "( Coin base account found : ${COINBASE} )" ;
+    else
+      echo "( No coin base account found. )" ;
+      COINBASE="";
+    fi;
+
   fi;
+
 
 };
 
@@ -524,14 +332,14 @@ function initializeBlockChain()
 {
 
   echo -e "\n ~~ Initialize the Block Chain's foundation block" ;
-  geth --datadir "${WORK_DIR}/geth" init ${WORK_DIR}/Genesis.json
+  geth --datadir "${WORK_DIR}/geth" init ${WORK_DIR}/${GENESIS_FILE}
 
 };
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-#  createDAGfile -- Builds the Dagger-Quasimodo file, if not exists
+#  createDAGfileIfNotYetDone -- Builds the Dagger-Quasimodo file, if not exists
 #
-function createDAGfile()
+function createDAGfileIfNotYetDone()
 {
 
   if [ ! -f ~/.ethash/full-R23-0000000000000000 ]; then  
@@ -543,15 +351,13 @@ function createDAGfile()
 };
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-#  obtainSimpleMiningScript -- JavaScript to get the first few fake ether to work with
+#  addSimpleMiningScript -- JavaScript to get the first few fake ether to work with
 #
-function obtainSimpleMiningScript()
+function addSimpleMiningScript()
 {
 
-  echo -e "\n ~~ Obtain mining initialization script. " ;
-  declare ORGANIZATION="martinhbramwell";
-  declare GIST_UUID="e03cb203b36a9d1523a73c7fd0409e3e";
-  wget -nv -O ${WORK_DIR}/${MINING_SCRIPT} https://gist.githubusercontent.com/${ORGANIZATION}/${GIST_UUID}/raw/${MINING_SCRIPT};
+  echo -e "\n ~~ copy mining initialization script to workspace. " ;
+  cp ${MINING_SCRIPT} ${WORK_DIR};
 
 };
 
@@ -722,6 +528,18 @@ function mineFirstBlocksIfZeroBalance()
 };
 
 
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#  createTransactionMonitoringExample -- Get the unconfigured Genesis file
+#
+function createTransactionMonitoringExample()
+{
+
+  echo -e "\n ~~ Copying a JavaScript example of transaction monitoring.";
+  cp ./js/${MONITORING_EXAMPLE} ${WORK_DIR}/scripts;
+
+};
+
+
 # ############################################################################
 #
 #       This is where all the work starts
@@ -746,6 +564,7 @@ if [[ "${NODE_TYPE}" == "${CLIENT_NODE_TYPE}"  ||  "${NODE_TYPE}" == "${ROOT_NOD
 
   prepareWorkingFilesStructure;
 
+  declare GENESIS_FILE="Genesis.json";
   selectivelyPurgeFilesAsRequested;
 
   recordAccountsPassword;
@@ -754,16 +573,15 @@ if [[ "${NODE_TYPE}" == "${CLIENT_NODE_TYPE}"  ||  "${NODE_TYPE}" == "${ROOT_NOD
   getBaseAccount;
   makeInitialCoinBaseAccount;
 
-  declare GENESIS_FILE="Genesis.json";
   if [[  "${NODE_TYPE}" == "${ROOT_NODE_TYPE}" ]]; then
 
-    getUnconfiguredGenesisFile;
+    addUnconfiguredGenesisFile;
 
     configureGenesisFile;
 
     initializeBlockChain;
 
-    createDAGfile;
+    createDAGfileIfNotYetDone;
 
   else
 
@@ -774,7 +592,7 @@ if [[ "${NODE_TYPE}" == "${CLIENT_NODE_TYPE}"  ||  "${NODE_TYPE}" == "${ROOT_NOD
   fi;
 
   declare MINING_SCRIPT="initialTrivialMiningScript.js";
-  obtainSimpleMiningScript;
+  addSimpleMiningScript;
 
   declare BALANCE=0;
   getBaseAccountBalance;
@@ -803,11 +621,23 @@ if [[ "${NODE_TYPE}" == "${CLIENT_NODE_TYPE}"  ||  "${NODE_TYPE}" == "${ROOT_NOD
   echo -e "\n ~~ Then to pause mining                  > miner.stop() ";
 
   if [[ "${NODE_TYPE}" == "${CLIENT_NODE_TYPE}" ]]; then
+
     createSimpleTransactionExample;
-    exit 1;
     echo -e "\n ~~ To pay to the root node's base acct use these two commands.";
     echo -e "        > personal.unlockAccount(eth.accounts[0], 'plokplok');";
     echo -e "        > eth.sendTransaction({from: eth.accounts[0], to: ${PEER_ACCT}, value: web3.toWei(1, \"ether\")})";
+
+  else
+
+    declare MONITORING_EXAMPLE="MineIfWorkToBeDone.js";
+    createTransactionMonitoringExample;
+    echo -e "\n ~~ To have your root node process transactions automatically run it with this command . . .";
+    echo geth --datadir "${WORK_DIR}/geth" --jspath "${WORK_DIR}/scripts" --preload \"${MONITORING_EXAMPLE}\" --verbosity 3 --maxpeers 5 --networkid ${NETWORK_ID} --nodiscover console 2\>\> /home/you/.EthPriv/prvWhsmn.log
+    echo -e "    When there are transactions in need of processing you will see . . .  ";
+    echo -e "     * ==  Pending transactions! Mining...  == *    ";
+    echo -e "  . . . and once all transactions have been processed it reports . . .    ";
+    echo -e "     * ==  No transactions! Mining stopped.  == *   ";    
+
   fi;  
 
   echo -e "\n ~~ To attach from another local terminal session, use :";
