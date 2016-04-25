@@ -71,7 +71,8 @@ function askUserForNodeType()
   CHOICE="";
   NODE_TYPE="";
 
-  source ${USER_VARS_FILE_NAME};
+  loadShellVars;
+  
   if [[ "${NODE_TYPE}" == "${CLIENT_NODE_TYPE}"  ||  "${NODE_TYPE}" == "${ROOT_NODE_TYPE}"  ]]; then
 
     echo "This node was previously built as a : ${NODE_TYPE}"; 
