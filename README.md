@@ -1,4 +1,4 @@
-# InitializeEthereumPrivateNetwork
+# Initialize Ethereum Private Network
 
 Start a basic Ethereum private network in minutes!
 
