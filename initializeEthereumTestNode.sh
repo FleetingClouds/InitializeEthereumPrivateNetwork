@@ -649,8 +649,8 @@ if [[ "${NODE_TYPE}" == "${CLIENT_NODE_TYPE}"  ||  "${NODE_TYPE}" == "${ROOT_NOD
 
   if [[ "${NODE_TYPE}" == "${ROOT_NODE_TYPE}" ]]; then
 
-    pwd;
     cp ./utils/collectInitializationPackage.sh ${WORK_DIR};
+    chmod a+x ${WORK_DIR}/collectInitializationPackage.sh;
 
     echo -e "\n ~~ Client nodes will need these four data elements in order to connect :";
     echo -e "    ~ The IP address of your root node machine                      :: ${LOCAL_IP_ADDR}";
