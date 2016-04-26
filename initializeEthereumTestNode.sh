@@ -72,7 +72,7 @@ function askUserForNodeType()
   NODE_TYPE="";
 
   loadShellVars;
-  
+
   if [[ "${NODE_TYPE}" == "${CLIENT_NODE_TYPE}"  ||  "${NODE_TYPE}" == "${ROOT_NODE_TYPE}"  ]]; then
 
     echo "This node was previously built as a : ${NODE_TYPE}"; 
@@ -140,6 +140,7 @@ function installDependencies()
 
   if aptNotYetInstalled "ethereum"; then
 
+    echo " ~~ Installing dependencies . . .";
     sudo apt-get -y install software-properties-common;
     # # sudo add-apt-repository -y ppa:ethereum/ethereum;
     sudo add-apt-repository -y ppa:ethereum/ethereum-dev;
@@ -632,11 +633,11 @@ if [[ "${NODE_TYPE}" == "${CLIENT_NODE_TYPE}"  ||  "${NODE_TYPE}" == "${ROOT_NOD
 
     declare MONITORING_EXAMPLE="MineIfWorkToBeDone.js";
     createTransactionMonitoringExample;
-    echo -e "\n ~~ To have your root node process transactions automatically run it with this command . . .";
-    echo geth --datadir "${WORK_DIR}/geth" --jspath "${WORK_DIR}/scripts" --preload \"${MONITORING_EXAMPLE}\" --verbosity 3 --maxpeers 5 --networkid ${NETWORK_ID} --nodiscover console 2\>\> /home/you/.EthPriv/prvWhsmn.log
+    echo -e "\n ~~ To have your root node process transactions automatically run, it with this command . . .";
+    echo geth --datadir "${WORK_DIR}/geth" --jspath "${WORK_DIR}/scripts" --preload \"${MONITORING_EXAMPLE}\" --verbosity 3 --maxpeers 5 --networkid ${NETWORK_ID} --nodiscover console 2\>\> ${WORK_DIR}/prvWhsmn.log
     echo -e "    When there are transactions in need of processing you will see . . .  ";
     echo -e "     * ==  Pending transactions! Mining...  == *    ";
-    echo -e "  . . . and once all transactions have been processed it reports . . .    ";
+    echo -e "  . . . and once all transactions have been processed it will report . . .    ";
     echo -e "     * ==  No transactions! Mining stopped.  == *   ";    
 
   fi;  
