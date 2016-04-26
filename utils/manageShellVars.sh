@@ -34,14 +34,10 @@ function addShellVar() {
 #
 function loadShellVars() {
 
-  echo " *************************** ${USER_VARS_FILE_NAME}";
-
   if [ -f ${USER_VARS_FILE_NAME} ]; then
-    echo "A";
     source ${USER_VARS_FILE_NAME}
   else
 
-    echo "B";
     for varkey in "${!SHELLVARNAMES[@]}"; do
       X=${SHELLVARNAMES[$varkey]};
       SHELLVARS["${X},VAL"]=${!X};
