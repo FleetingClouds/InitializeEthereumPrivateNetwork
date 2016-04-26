@@ -400,7 +400,7 @@ function getRootNodeOperationsFiles()
 
   else
 
-    if [[ ! -f .ssh/id_rsa  ]]; then
+    if [[ ! -f ${HOME}/.ssh/id_rsa  ]]; then
       createKeyPairForSSH;
     fi;
 
