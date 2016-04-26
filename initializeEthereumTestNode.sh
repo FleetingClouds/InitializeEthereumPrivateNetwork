@@ -502,13 +502,13 @@ EOSTE
 
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-#  mineFirstBlocksIfZeroBalance -- Execute mining script if no Ether mined yet 
+#  mineSomeBlocksIfLowBalance -- Execute mining script if no Ether mined yet 
 #
-function mineFirstBlocksIfZeroBalance()
+function mineSomeBlocksIfLowBalance()
 {
 
   echo -e "\n ~~ Mine a few blocks if Eth balance too low. " ;
-  if [[ ${BALANCE%.*} -lt 1 ]]; then
+  if [[ ${BALANCE%.*} -lt 25 ]]; then
 
     echo -e "\n ~~ Executing mining initialization script for first three blocks. " ;
     echo "     You can monitor mining progress with : ";
@@ -609,7 +609,7 @@ if [[ "${NODE_TYPE}" == "${CLIENT_NODE_TYPE}"  ||  "${NODE_TYPE}" == "${ROOT_NOD
 
   # exit 1;     
 
-  mineFirstBlocksIfZeroBalance;
+  mineSomeBlocksIfLowBalance;
 
   echo "";
   echo "";
