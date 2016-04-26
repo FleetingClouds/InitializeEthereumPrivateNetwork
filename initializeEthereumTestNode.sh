@@ -359,7 +359,7 @@ function addSimpleMiningScript()
 {
 
   echo -e "\n ~~ copy mining initialization script to workspace. " ;
-  cp ${MINING_SCRIPT} ${WORK_DIR};
+  cp ./js/${MINING_SCRIPT} ${WORK_DIR}/scripts;
 
 };
 
@@ -519,7 +519,7 @@ function mineFirstBlocksIfZeroBalance()
         --maxpeers "5" \
         --networkid ${NETWORK_ID} \
         --nodiscover \
-      js ${WORK_DIR}/${MINING_SCRIPT} \
+      js ${WORK_DIR}/scripts/${MINING_SCRIPT} \
               2>> ${WORK_DIR}/prvWhsmn.log
 
   else
