@@ -434,6 +434,10 @@ function getRootNodeOperationsFiles()
   scp -qr ${NETWORK_ROOT_UID}@${NETWORK_ROOT_IP}:/home/${NETWORK_ROOT_UID}/.ethash ${HOME};
 
   echo -e "\n ~~  RPC to get root node base account.";
+  declare GETH_CONSOLE_RUNNING=$(ssh ${NETWORK_ROOT_UID}@${NETWORK_ROOT_IP} "ps aux | grep -v grep | grep geth | grep -c console");
+  declare GETH_CONNECTION_TYPE="console";
+
+  if [[  ${GETH_CONSOLE_RUNNING} -gt 0  ]]; then GETH_CONNECTION_TYPE="attach"; fi;
 
 
   PEER_ACCT=$(ssh ${NETWORK_ROOT_UID}@${NETWORK_ROOT_IP} geth \
@@ -441,7 +445,7 @@ function getRootNodeOperationsFiles()
     --datadir "${ROOT_PROJECT_DIR}/geth" \
     --networkid ${NETWORK_ID} \
     --exec \"eth.accounts[0]\" \
-  console);
+  ${GETH_CONNECTION_TYPE});
 
   echo "Peer account : ${PEER_ACCT}";
 

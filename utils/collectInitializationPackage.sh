@@ -17,7 +17,7 @@ echo "Host node reports : \"Collecting client initialization files from ${DIR} i
 
 cd ${DIR};
 
-declare GETH_CONSOLE_RUNNING=$(ps aux | grep geth | grep -c console);
+declare GETH_CONSOLE_RUNNING=$(ps aux | grep geth |  grep -v grep | grep -c console);
 declare GETH_CONNECTION_TYPE="console";
 
 if [[  ${GETH_CONSOLE_RUNNING} -gt 0  ]]; then GETH_CONNECTION_TYPE="attach"; fi;
