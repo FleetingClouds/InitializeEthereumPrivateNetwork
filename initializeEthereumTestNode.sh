@@ -165,7 +165,6 @@ function prepareWorkingFilesStructure()
 
   mkdir -p ${WORK_DIR}/geth;
   mkdir -p ${WORK_DIR}/scripts;
-#  touch ${WORK_DIR}/geth/history;
   touch ${WORK_DIR}/prvWhsmn.log;
 
   if [[ ! -d ~/.ssh ]]; then 
@@ -432,7 +431,7 @@ function getRootNodeOperationsFiles()
   tar --gunzip --extract --file /tmp/initialFiles.tar.gz --directory ${WORK_DIR};
 
   echo -e "\n ~~  SCP to pull over the DAG file.";
-  # scp -qr ${NETWORK_ROOT_UID}@${NETWORK_ROOT_IP}:/home/${NETWORK_ROOT_UID}/.ethash ${HOME};
+  scp -qr ${NETWORK_ROOT_UID}@${NETWORK_ROOT_IP}:/home/${NETWORK_ROOT_UID}/.ethash ${HOME};
 
   echo -e "\n ~~  RPC to get root node base account.";
 
@@ -472,17 +471,17 @@ EOSNJ
 function createSimpleTransactionExample()
 {
 
-  cat << EOSTE > ${WORK_DIR}/simpleTransactionExample.js
+  cat << EOSTE > ${WORK_DIR}/scripts/simpleTransactionExample.js
 
 primary = eth.accounts[0];
 primary_balance = web3.fromWei(eth.getBalance(primary), "ether");
 
 
-personal.newAccount('plokplok');
+personal.newAccount('${ACCOUNT_PASSWORD}');
 secondary = eth.accounts[0];
 secondary_balance = web3.fromWei(eth.getBalance(secondary), "ether");
 
-personal.unlockAccount(primary, "plokplok");
+personal.unlockAccount(primary, "${ACCOUNT_PASSWORD}");
 eth.sendTransaction({from: primary, to: secondary, value: web3.toWei(3.3, "ether")})
 
 miner.start(2); admin.sleepBlocks(1); miner.stop();
@@ -490,7 +489,7 @@ web3.fromWei(eth.getBalance(secondary), "ether"); // ought to be 3.3
 
 remote_account=${PEER_ACCT};
 
-personal.unlockAccount(secondary, 'plokplok');
+personal.unlockAccount(secondary, '${ACCOUNT_PASSWORD}');
 eth.sendTransaction({from: secondary, to: remote_account, value: web3.toWei(2.2, "ether")})
 
 miner.start(2); admin.sleepBlocks(1); miner.stop();
@@ -515,7 +514,7 @@ function mineSomeBlocksIfLowBalance()
     echo "          tail -fn 500 ${WORK_DIR}/prvWhsmn.log";
     geth \
         --datadir "${WORK_DIR}/geth" \
-        --verbosity 3 \
+        --verbosity 4 \
         --maxpeers "5" \
         --networkid ${NETWORK_ID} \
         --nodiscover \
@@ -626,7 +625,7 @@ if [[ "${NODE_TYPE}" == "${CLIENT_NODE_TYPE}"  ||  "${NODE_TYPE}" == "${ROOT_NOD
 
     createSimpleTransactionExample;
     echo -e "\n ~~ To pay to the root node's base acct use these two commands.";
-    echo -e "        > personal.unlockAccount(eth.accounts[0], 'plokplok');";
+    echo -e "        > personal.unlockAccount(eth.accounts[0], '${ACCOUNT_PASSWORD}');";
     echo -e "        > eth.sendTransaction({from: eth.accounts[0], to: ${PEER_ACCT}, value: web3.toWei(1, \"ether\")})";
 
   else
