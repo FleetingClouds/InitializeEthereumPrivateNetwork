@@ -12,7 +12,7 @@ function mineIfWorkToBeDone() {
         console.log("  * ==  Pending transactions! Mining...  == *");
         miner.start(mining_threads);
     } else {
-        miner.stop();  // This param means nothing
+        miner.stop();
         console.log("  * ==  No transactions! Mining stopped.  == *");
     }
 }

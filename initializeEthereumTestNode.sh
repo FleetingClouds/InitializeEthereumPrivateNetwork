@@ -430,8 +430,12 @@ function getRootNodeOperationsFiles()
   rm -fr ${WORK_DIR}/geth/chaindata
   tar --gunzip --extract --file /tmp/initialFiles.tar.gz --directory ${WORK_DIR};
 
-  echo -e "\n ~~  SCP to pull over the DAG file.";
-  scp -qr ${NETWORK_ROOT_UID}@${NETWORK_ROOT_IP}:/home/${NETWORK_ROOT_UID}/.ethash ${HOME};
+  echo -e "\n ~~  SCP to pull over the DAG file, if necessary.";
+  if [[ -f ~/.ethash/full-R23-0000000000000000 ]]; then
+    echo "(  Have DAG already.)"; 
+  else
+    scp -qr ${NETWORK_ROOT_UID}@${NETWORK_ROOT_IP}:/home/${NETWORK_ROOT_UID}/.ethash ${HOME};
+  fi;
 
   echo -e "\n ~~  RPC to get root node base account.";
   
@@ -453,7 +457,7 @@ function getRootNodeOperationsFiles()
   
   echo "Peer account : ${PEER_ACCT}";
 
-  echo -e " (Root node files have been acquired)";
+  echo -e "(  Root node files have been acquired.  )";
 
 
 
