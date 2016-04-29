@@ -24,18 +24,32 @@ set -e;
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
-#    CONSTANTS
+#    DEPENDENCIES
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+
+source ./utils/utilities.sh
+
+declare MIN_MEM=1100;
+if checkSufficientMemory ${MIN_MEM}; then
+  echo -e "\n         According to 'free -m' your available memory is 
+         less than the viable minimum :: ${MIN_MEM}MB.\n";
+  exit 1;
+fi;
+
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#
+#    CONSTANTS
+#
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 CLIENT_NODE_TYPE="CLIENT";
 ROOT_NODE_TYPE="ROOT";
 
 USER_VARS_FILE_NAME="${HOME}/.userVars.sh";
 
-source ./utils/utilities.sh
 source ./utils/manageShellVars.sh
-
 source ./shellVarDefs.sh
 
 
@@ -562,7 +576,6 @@ function createTransactionMonitoringExample()
 echo -e "\n\n";
 echo -e "This 'wizard' makes it easy to set up an Etheruem private network between virtual machines";
 echo -e "It's intended as a quick start for developer experimentation";
-
 
 loadShellVars;
 
