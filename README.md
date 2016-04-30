@@ -65,11 +65,11 @@ If you have inadequate **available** memory you'll see ...
 
     Please choose <r>oot node, <c>lient node or <q>uit. (r/c/q) ::  
 
-The choice makes no sense for a *peer to peer* system, but it's there for convenience.  It just means that the first node created acts as a source of configuration specifics for subsequent nodes. The script takes care of the data ecchange, so you won't have to.
+This choice makes no sense for a *peer to peer* system, but it's there for convenience.  It just means that the first node created acts as a source of configuration specifics for subsequent nodes. The script takes care of the data exchange, so you won't have to.
      
 ####  First (root) node
 
-If you type 'r', 'y' & 'n', without <return>, you'll see :
+If you type `ryn`, (without &lt;return> ! ), you'll see :
 
     Please choose <r>oot node, <c>lient node or <q>uit. (r/c/q) ::  r
     Get parameters and generate a new ROOT node now? (y/n)::  y
@@ -108,7 +108,7 @@ Typically I do :
   
 The script then does these things for you :
 
-1. Installs`ethereum` from `ppa:ethereum/ethereum-dev`
+1. Installs `ethereum` from `ppa:ethereum/ethereum-dev`
 2. Prepares work directories where you specified, eg `/home/you/.dappNet`
 3. Writes the accounts password to `~/.ssh/.EthereumAccountsPassword`
 4. Tries to get your coin base account number if available
@@ -117,9 +117,9 @@ The script then does these things for you :
 7. Initializes you private Block Chain's foundation block, unless done already
 8. Copies a mining initialization script to your workspace (from `./js/initialTrivialMiningScript.js`)
 9. Tries to read your coin base account balance
-10. Mines a few blocks if its balance is low (from previous sessions)
+10. Mines a few blocks, if your balance is low (from previous sessions)
 
-When th's done it shows a *help* sheet :
+When that's done it shows a *help* sheet :
 
           * * * Setup has Finished * * *  
 
