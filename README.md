@@ -4,6 +4,14 @@ Start a basic Ethereum private network in minutes!
 
 A script for initializing an Ethereum private network for testing and development.
 
+### Credit / References
+
+Based on these works :
+
+- [Creating a Private Chain/Testnet](https://souptacular.gitbooks.io/ethereum-tutorials-and-tips-by-hudson/content/)
+- [Setting up private network or local cluster](https://github.com/ethereum/go-ethereum/wiki/Setting-up-private-network-or-local-cluster)
+- [How To Create A Private Ethereum Chain](http://adeduke.com/2015/08/how-to-create-a-private-ethereum-chain/)
+
 ### Prerequisites
 
 These scripts were developed for two freshly created Xubuntu 16.04LTS virtual machines running in Qemu/KVM.
