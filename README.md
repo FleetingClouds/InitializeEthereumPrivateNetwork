@@ -228,30 +228,27 @@ The script then does these things for you :
 
 When that's done it shows a *help* sheet :
 
-      * * * Setup has Finished * * *
+          * * * Setup has Finished * * *
 
- You are ready to start mining. Run the following command : 
+     You are ready to start mining. Run the following command : 
 
-geth --datadir /home/you/.dappNet/geth --verbosity 3 --maxpeers 5 --networkid 7028 --nodiscover console 2>> /home/you/.dappNet/prvWhsmn.log
-
-
- ~~ To view accumulated ether, enter      > web3.fromWei(eth.getBalance(eth.accounts[0]), "ether") 
-
- ~~ To continue mining                    > miner.start(2) 
-
- ~~ Then to pause mining                  > miner.stop() 
-
- ~~ To pay to the root node's base acct use these two commands.
-        > personal.unlockAccount(eth.accounts[0], 'plokplok');
-        > eth.sendTransaction({from: eth.accounts[0], to: "0x090b0d4eadf1e490e6ad791194db364d0a5107da", value: web3.toWei(1, "ether")})
-
- ~~ To attach from another local terminal session, use :
-geth --datadir /home/you/.dappNet/geth --networkid 7028 attach ipc://home/you/.dappNet/geth/geth.ipc
+    geth --datadir /home/you/.dappNet/geth --verbosity 3 --maxpeers 5 --networkid 7028 --nodiscover console 2>> /home/you/.dappNet/prvWhsmn.log
 
 
+     ~~ To view accumulated ether, enter      > web3.fromWei(eth.getBalance(eth.accounts[0]), "ether") 
 
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-Done.
+     ~~ To continue mining                    > miner.start(2) 
+
+     ~~ Then to pause mining                  > miner.stop() 
+
+     ~~ To pay to the root node's base acct use these two commands.
+            > personal.unlockAccount(eth.accounts[0], 'plokplok');
+            > eth.sendTransaction({from: eth.accounts[0], to: "0x090b0d4eadf1e490e6ad791194db364d0a5107da", value: web3.toWei(1, "ether")})
+
+     ~~ To attach from another local terminal session, use :
+    geth --datadir /home/you/.dappNet/geth --networkid 7028 attach ipc://home/you/.dappNet/geth/geth.ipc
 
 
 
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    Done.
