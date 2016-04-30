@@ -657,7 +657,7 @@ if [[ "${NODE_TYPE}" == "${CLIENT_NODE_TYPE}"  ||  "${NODE_TYPE}" == "${ROOT_NOD
 
     declare MONITORING_EXAMPLE="MineIfWorkToBeDone.js";
     createTransactionMonitoringExample;
-    echo -e "\n ~~ To have your root node process transactions automatically run, it with this command . . .";
+    echo -e "\n ~~ To have your root node process transactions automatically run it with this command . . .";
     echo geth --datadir "${WORK_DIR}/geth" --jspath "${WORK_DIR}/scripts" --preload \"${MONITORING_EXAMPLE}\" --verbosity 3 --maxpeers 5 --networkid ${NETWORK_ID} --nodiscover console 2\>\> ${WORK_DIR}/prvWhsmn.log
     echo -e "    When there are transactions in need of processing you will see . . .  ";
     echo -e "     * ==  Pending transactions! Mining...  == *    ";
