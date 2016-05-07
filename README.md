@@ -178,6 +178,7 @@ If you type `cyn`, (without &lt;return> ! ), you'll see :
         9  Delete block chain (y/n) : 
        10  Delete other client files (y/n) : 
 
+
     Is this correct? (y/n/q) ::
  
 So these are :
@@ -251,3 +252,4 @@ When that's done it shows a *help* sheet :
 
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     Done.
+

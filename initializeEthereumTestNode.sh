@@ -28,10 +28,12 @@ set -e;
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+CURR_DIR="$( cd -P "$( dirname "${BASH_SOURCE[0]}" )" && pwd )";
 
-source ./utils/utilities.sh
+echo ${CURR_DIR};
+source ${CURR_DIR}/utils/utilities.sh
 
-declare MIN_MEM=1100;
+declare MIN_MEM=1200;
 if checkSufficientMemory ${MIN_MEM}; then
   echo -e "\n         According to 'free -m' your available memory is 
          less than the viable minimum :: ${MIN_MEM}MB.\n";
@@ -49,8 +51,8 @@ ROOT_NODE_TYPE="ROOT";
 
 USER_VARS_FILE_NAME="${HOME}/.userVars.sh";
 
-source ./utils/manageShellVars.sh
-source ./shellVarDefs.sh
+source ${CURR_DIR}/utils/manageShellVars.sh
+source ${CURR_DIR}/shellVarDefs.sh
 
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -179,6 +181,8 @@ function prepareWorkingFilesStructure()
 
   mkdir -p ${WORK_DIR}/geth;
   mkdir -p ${WORK_DIR}/scripts;
+  mkdir -p ${HOME}/${EXAMPLES_DIR};
+
   touch ${WORK_DIR}/prvWhsmn.log;
 
   if [[ ! -d ~/.ssh ]]; then 
@@ -204,7 +208,7 @@ function selectivelyPurgeFilesAsRequested()
 
     if [[ ${DROP_BLOCKCHAIN} == "y" ]]; then 
       echo "   ~ Purging block chain files";
-      rm -fr ${WORK_DIR}/geth/chaindata; 
+      rm -fr ${WORK_DIR}/geth/chaindata;
     fi;
 
     if [[ ${DROP_CLIENTFILES} == "y" ]]; then 
@@ -215,11 +219,11 @@ function selectivelyPurgeFilesAsRequested()
       rm -fr ${WORK_DIR}/geth/history;
       rm -fr ${WORK_DIR}/geth/nodekey;
       rm -fr ${WORK_DIR}/${GENESIS_FILE};
+      rm -fr ${WORK_DIR}/geth/static-nodes.json
       
       rm -fr ${WORK_DIR}/prvWhsmn.log;
       rm -fr ${WORK_DIR}/.pwd;
     fi;
-
 
   else
     echo "Skipped purging files.";
@@ -264,12 +268,14 @@ function getBaseAccount()
   echo -e "\n ~~ Try to get base account";
   CB=$(geth --datadir "${WORK_DIR}/geth" --networkid ${NETWORK_ID} --verbosity 0 --exec eth.accounts[0] console 2> /tmp/err);
   if [[ "$?" -gt "0" ]]; then
+    CB=$(geth --datadir "${WORK_DIR}/geth" --networkid ${NETWORK_ID} --verbosity 0 --exec eth.accounts[0] attach ipc:/${WORK_DIR}/geth/geth.ipc 2> /tmp/err);
+  fi;
 
-    echo -e "\n$(</tmp/err).";
-    echo -e "      Is geth running already?  Quitting . . . ";
-    exit 1;
-
-  else
+#    echo -e "\n$(</tmp/err).";
+#    echo -e "      Is geth running already?  Quitting . . . ";
+#    exit 1;
+#
+#  else
 
     COINBASE=$(sed 's/^"\(.*\)"$/\1/' <<< ${CB});
     # echo "Checking : ${COINBASE} )" ;
@@ -280,13 +286,13 @@ function getBaseAccount()
       COINBASE="";
     fi;
 
-  fi;
+#  fi;
 
 
 };
 
 
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #  getBaseAccountBalance -- If eth.account[0] exists, get it into a shell variable
 #
 function getBaseAccountBalance()
@@ -295,7 +301,10 @@ function getBaseAccountBalance()
   echo -e "\n ~~ Try to read base account balance";
   if [[ ${COINBASE} =~ ^"0x"[a-f0-9]{40}$ ]]; then
     echo "   ~ Getting balance of base account : ${COINBASE} )" ;
-    BALANCE=$(geth --datadir "${WORK_DIR}/geth" --networkid ${NETWORK_ID} --verbosity 0 --exec 'web3.fromWei(eth.getBalance(eth.accounts[0]), "ether")' console);
+    BALANCE=$(geth --datadir "${WORK_DIR}/geth" --networkid ${NETWORK_ID} --verbosity 0 --exec 'web3.fromWei(eth.getBalance(eth.accounts[0]), "ether")' console 2> /tmp/err);
+    if [[ "$?" -gt "0" ]]; then
+      BALANCE=$(geth --datadir "${WORK_DIR}/geth" --networkid ${NETWORK_ID} --verbosity 0 --exec 'web3.fromWei(eth.getBalance(eth.accounts[0]), "ether")' attach ipc:/${WORK_DIR}/geth/geth.ipc 2> /tmp/err);
+    fi;
     echo "   ~ Current coin base balance : ${BALANCE} Eth";
   else
     echo "Found no coin base account." ;
@@ -305,7 +314,7 @@ function getBaseAccountBalance()
 };
 
 
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #  makeInitialCoinBaseAccount -- create the account to write into the Genesis file
 #
 function makeInitialCoinBaseAccount()
@@ -531,9 +540,9 @@ EOSTE
 #
 function mineSomeBlocksIfLowBalance()
 {
-
-  echo -e "\n ~~ Mine a few blocks if Eth balance too low. " ;
-  if [[ ${BALANCE%.*} -lt 25 ]]; then
+  declare MINBAL=10;
+  echo -e "\n ~~ Mine a few blocks if Eth balance ${BALANCE%.*} is less than ${MINBAL}. " ;
+  if [[ ${BALANCE%.*} -lt ${MINBAL} ]]; then
 
     echo -e "\n ~~ Executing mining initialization script for first three blocks. " ;
     echo "     You can monitor mining progress with : ";
@@ -551,7 +560,6 @@ function mineSomeBlocksIfLowBalance()
     echo "   ~ Skipped mining first blocks 'coz balance is ${BALANCE}.";
   fi
 
-
 };
 
 
@@ -567,11 +575,84 @@ function createTransactionMonitoringExample()
 };
 
 
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#  createRunOnSaveScriptExample -- Get the unconfigured Genesis file
+#
+function createRunOnSaveScriptExample()
+{
+
+  echo -e "\n ~~ Copying an example of Run-On-Save-Script (ROSS) usage to ${WORK_DIR}/scripts.";
+  cp ${CURR_DIR}/js/RunOnSaveScript/ROSSutils.js ${WORK_DIR}/scripts;
+  cp ${CURR_DIR}/js/RunOnSaveScript/rossDemo.js ${HOME}/${EXAMPLES_DIR};
+
+  cat << EOPPJS > ${HOME}/.ssh/pwdPrimary.js
+function pwdPrimary(){
+  return "${ACCOUNT_PASSWORD}";
+}
+EOPPJS
+
+};
+
+
+function addScriptAliasNamesToUserProfile()
+{
+
+  declare START_UP_FILE=${HOME}/.profile;
+
+  declare START_EXPLANATION="### Begin Ethereum Dev Script additions. From https://github.com/FleetingClouds/InitializeEthereumPrivateNetwork";
+  declare END_EXPLANATION="### End Ethereum Dev Script additions.";
+
+  declare aliasRoss="cmdROSS()";
+  declare aliasAutoGeth="cmdGeth()";
+#  declare aliasInstCtrt="alias instCtrt" ;
+
+  declare newAliasRoss="${aliasRoss} { ${CURR_DIR}/utils/run_on_save.sh \$*; }; export -f cmdROSS;";
+  declare newAliasAutoGeth="${aliasAutoGeth} { geth --datadir ${WORK_DIR}/geth --jspath ${WORK_DIR}/scripts --preload 'ROSSutils.js' --exec 'currentTask()' --networkid 7028 attach ipc://home/you/.dappNet/geth/geth.ipc; }; export -f cmdGeth;";
+#  declare newAliasInstCtrt="${aliasInstCtrt}=\"${CURR_DIR}/utils/installContract.sh\";";
+
+  echo -e "\n ~~ Adding script alias names to user profile (${START_UP_FILE}).";
+
+  if [[ $(cat ${START_UP_FILE} | grep -c "${START_EXPLANATION}") -lt 1 ]]; then
+    echo ${START_EXPLANATION} >> ${START_UP_FILE};
+  fi;
+
+  if [[ $(cat ${START_UP_FILE} | grep -c "${aliasRoss}") -gt 0 ]]; then
+    if [[ $(cat ${START_UP_FILE} | grep -c "${newAliasRoss}") -lt 1 ]]; then
+      sed -i "/${aliasRoss}/c${newAliasRoss}" ${START_UP_FILE};
+    fi;
+  else
+    echo ${newAliasRoss} >> ${START_UP_FILE};
+  fi;
+
+  if [[ $(cat ${START_UP_FILE} | grep -c "${aliasAutoGeth}") -gt 0 ]]; then
+    if [[ $(cat ${START_UP_FILE} | grep -c "${newAliasAutoGeth}") -lt 1 ]]; then
+      sed -i "/${aliasAutoGeth}/c${newAliasAutoGeth}" ${START_UP_FILE};
+    fi;
+  else
+    echo ${newAliasAutoGeth} >> ${START_UP_FILE};
+  fi;
+
+#  if [[ $(cat ${START_UP_FILE} | grep -c "${aliasInstCtrt}") -gt 0 ]]; then
+#    if [[ $(cat ${START_UP_FILE} | grep -c "${newAliasInstCtrt}") -lt 1 ]]; then
+#      sed -i "/${aliasInstCtrt}/c${newAliasInstCtrt}" ${START_UP_FILE};
+#    fi;
+#  else
+#    echo ${newAliasInstCtrt} >> ${START_UP_FILE};
+#  fi;
+
+  if [[ $(cat ${START_UP_FILE} | grep -c "${END_EXPLANATION}") -lt 1 ]]; then
+    echo ${END_EXPLANATION} >> ${START_UP_FILE};
+    echo "" >> ${START_UP_FILE};
+  fi;
+
+}
+
 # ############################################################################
 #
-#       This is where all the work starts
+#        This is where all the work starts
 #
 # ############################################################################
+
 
 echo -e "\n\n";
 echo -e "This 'wizard' makes it easy to set up an Etheruem private network between virtual machines";
@@ -588,6 +669,7 @@ if [[ "${NODE_TYPE}" == "${CLIENT_NODE_TYPE}"  ||  "${NODE_TYPE}" == "${ROOT_NOD
 
   installDependencies;
 
+  declare EXAMPLES_DIR="projects/examples";
   prepareWorkingFilesStructure;
 
   declare GENESIS_FILE="Genesis.json";
@@ -609,12 +691,14 @@ if [[ "${NODE_TYPE}" == "${CLIENT_NODE_TYPE}"  ||  "${NODE_TYPE}" == "${ROOT_NOD
 
     createDAGfileIfNotYetDone;
 
-  else
+  elif [[ ! -d ~/.ethash || ! -d ${WORK_DIR}/geth/static-nodes.json ]]; then
 
     declare ENODE_SPEC="";
     declare PEER_ACCT="";
     getRootNodeOperationsFiles;
 
+  else
+    echo "------------------------";
   fi;
 
   declare MINING_SCRIPT="initialTrivialMiningScript.js";
@@ -622,16 +706,6 @@ if [[ "${NODE_TYPE}" == "${CLIENT_NODE_TYPE}"  ||  "${NODE_TYPE}" == "${ROOT_NOD
 
   declare BALANCE=0;
   getBaseAccountBalance;
-
-  # geth \
-  #     --datadir "${WORK_DIR}/geth" \
-  #     --verbosity 5 \
-  #     --maxpeers "2" \
-  #     --networkid ${NETWORK_ID} \
-  #     --nodiscover \
-  #     console  2>> ${WORK_DIR}/prvWhsmn.log;
-
-  # exit 1;     
 
   mineSomeBlocksIfLowBalance;
 
@@ -652,6 +726,14 @@ if [[ "${NODE_TYPE}" == "${CLIENT_NODE_TYPE}"  ||  "${NODE_TYPE}" == "${ROOT_NOD
     echo -e "\n ~~ To pay to the root node's base acct use these two commands.";
     echo -e "        > personal.unlockAccount(eth.accounts[0], '${ACCOUNT_PASSWORD}');";
     echo -e "        > eth.sendTransaction({from: eth.accounts[0], to: ${PEER_ACCT}, value: web3.toWei(1, \"ether\")})";
+
+
+    addScriptAliasNamesToUserProfile;
+    createRunOnSaveScriptExample;
+    echo -e "\n ~~ To test scripts and contracts each time you save editor changes (ross) try this : ";
+    echo -e "    $(whoami)@$(hostname):~$ source ~/.profile";
+    echo -e "    $(whoami)@$(hostname):~$ cd ${HOME}/${EXAMPLES_DIR}";
+    echo -e "    $(whoami)@$(hostname):~/${EXAMPLES_DIR}$ cmdROSS rossDemo.js cmdGeth";
 
   else
 
