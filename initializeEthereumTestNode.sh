@@ -761,6 +761,7 @@ if [[ "${NODE_TYPE}" == "${CLIENT_NODE_TYPE}"  ||  "${NODE_TYPE}" == "${ROOT_NOD
     echo -e "\n ~~ Client nodes will need these four data elements in order to connect :";
     echo -e "    ~ The IP address of your root node machine                      :: ${LOCAL_IP_ADDR}";
     echo -e "    ~ The directory for geth's working files ON THE ROOT NODE       :: ${PROJECT_DIR}";
+    echo -e "    ~ The Ethereum network ID                                       :: ${NETWORK_ID}";
     echo -e "    ~ The SSH user name of the root node machine's Ethereum account :: ${USER}";
     echo -e "    ~ The SSH password of the root node machine's Ethereum account  :: ????????????";
 
