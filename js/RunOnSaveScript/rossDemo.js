@@ -3,13 +3,15 @@ loadScript("/home/you/.ssh/pwdPrimary.js");
 var primary = eth.accounts[0];
 personal.unlockAccount(primary, pwdPrimary());
 
-console.log("Paying . . . ");
+var amount = 1.51;
+var payee = ROOT_PRIMARY_ACCOUNT;
+console.log("Paying " + amount + " out of " + web3.fromWei(eth.getBalance(eth.accounts[0]), "ether") + " from account : " + primary);
 eth.sendTransaction(
   {
     from : primary,
-    to : "0xc3cb526c6cbb072ea1913d5ba98e2670b3cb0d44",
-    value : web3.toWei(1, "ether")
-  }, function (e) {  console.log("Paid"); }
+    to : payee,
+    value : web3.toWei(amount, "ether")
+  }, function (e) {  console.log("Paid to " + payee); }
 );
 
 /*  --- */

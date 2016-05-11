@@ -54,6 +54,8 @@ USER_VARS_FILE_NAME="${HOME}/.userVars.sh";
 source ${CURR_DIR}/utils/manageShellVars.sh
 source ${CURR_DIR}/shellVarDefs.sh
 
+declare PRELOAD_SCRIPT_NAME="ROSSutils.js";
+declare DEMO_SCRIPT_NAME="rossDemo.js";
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #  Specify required shell var definitions by group
@@ -582,8 +584,9 @@ function createRunOnSaveScriptExample()
 {
 
   echo -e "\n ~~ Copying an example of Run-On-Save-Script (ROSS) usage to ${WORK_DIR}/scripts.";
-  cp ${CURR_DIR}/js/RunOnSaveScript/ROSSutils.js ${WORK_DIR}/scripts;
-  cp ${CURR_DIR}/js/RunOnSaveScript/rossDemo.js ${HOME}/${EXAMPLES_DIR};
+  cp ${CURR_DIR}/js/RunOnSaveScript/${PRELOAD_SCRIPT_NAME} ${WORK_DIR}/scripts;
+  cp ${CURR_DIR}/js/RunOnSaveScript/${DEMO_SCRIPT_NAME} ${HOME}/${EXAMPLES_DIR};
+  sed -i s/ROOT_PRIMARY_ACCOUNT/${PEER_ACCT}/ ${HOME}/${EXAMPLES_DIR}/${DEMO_SCRIPT_NAME};
 
   cat << EOPPJS > ${HOME}/.ssh/pwdPrimary.js
 function pwdPrimary(){
@@ -607,7 +610,7 @@ function addScriptAliasNamesToUserProfile()
 #  declare aliasInstCtrt="alias instCtrt" ;
 
   declare newAliasRoss="${aliasRoss} { ${CURR_DIR}/utils/run_on_save.sh \$*; }; export -f cmdROSS;";
-  declare newAliasAutoGeth="${aliasAutoGeth} { geth --datadir ${WORK_DIR}/geth --jspath ${WORK_DIR}/scripts --preload 'ROSSutils.js' --exec 'currentTask()' --networkid 7028 attach ipc://home/you/.dappNet/geth/geth.ipc; }; export -f cmdGeth;";
+  declare newAliasAutoGeth="${aliasAutoGeth} { geth --datadir ${WORK_DIR}/geth --jspath ${WORK_DIR}/scripts --preload '${PRELOAD_SCRIPT_NAME}' --exec 'currentTask()' --networkid ${NETWORK_ID} attach ipc:/${WORK_DIR}/geth/geth.ipc; }; export -f cmdGeth;";
 #  declare newAliasInstCtrt="${aliasInstCtrt}=\"${CURR_DIR}/utils/installContract.sh\";";
 
   echo -e "\n ~~ Adding script alias names to user profile (${START_UP_FILE}).";
@@ -625,6 +628,7 @@ function addScriptAliasNamesToUserProfile()
   fi;
 
   if [[ $(cat ${START_UP_FILE} | grep -c "${aliasAutoGeth}") -gt 0 ]]; then
+    echo "Looking for ${newAliasAutoGeth}";
     if [[ $(cat ${START_UP_FILE} | grep -c "${newAliasAutoGeth}") -lt 1 ]]; then
       sed -i "/${aliasAutoGeth}/c${newAliasAutoGeth}" ${START_UP_FILE};
     fi;
