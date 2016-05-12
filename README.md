@@ -245,11 +245,18 @@ When that's done it shows a *help* sheet :
             > personal.unlockAccount(eth.accounts[0], 'plokplok');
             > eth.sendTransaction({from: eth.accounts[0], to: "0x090b0d4eadf1e490e6ad791194db364d0a5107da", value: web3.toWei(1, "ether")})
 
+     ~~ Adding script alias names to user profile (/home/you/.profile).
+
+     ~~ Copying an example of Run-On-Save-Script (ROSS) usage to /home/you/.dappNet/scripts.
+
+     ~~ To test scripts and contracts each time you save editor changes (ross) try this : 
+        you@brnch1:~$ source ~/.profile
+        you@brnch1:~$ cd /home/you/projects/examples
+        you@brnch1:~/projects/examples$ cmdROSS rossDemo.js cmdGeth
+
      ~~ To attach from another local terminal session, use :
     geth --datadir /home/you/.dappNet/geth --networkid 7028 attach ipc://home/you/.dappNet/geth/geth.ipc
 
 
-
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     Done.
-
