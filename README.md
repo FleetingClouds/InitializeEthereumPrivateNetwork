@@ -261,7 +261,9 @@ When that's done it shows a *help* sheet :
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     Done.
 
-####  Examples
+###  Examples
+
+####  Run On Save Script (ross)
 
 Two helper functions were added to your user profile : 
 
@@ -272,7 +274,31 @@ Two helper functions were added to your user profile :
 
 ```cmdGeth``` calls ```geth``` passing, as parameters, the file location and network ID you specified when you last executed ```./initializeEthereumTestNode.sh```.  It also excutes the function, ```currentTask()``` from the script ```ROSSutils.js```  pre-loaded from the ```scripts``` sub-directory of the project directory.
 
-    cmdGeth() { geth --datadir /home/you/.dappNet/geth --jspath /home/you/.dappNet/scripts --preload 'theContractYouAreWorkingOnNow.js' --exec 'currentTask()' --networkid 7089 attach ipc://home/you/.dappNet/geth/geth.ipc; }; export -f cmdGeth;
+    cmdGeth() { geth --datadir /home/you/.dappNet/geth --jspath /home/you/.dappNet/scripts --preload 'ROSSutils.js' --exec 'currentTask()' --networkid 7089 attach ipc://home/you/.dappNet/geth/geth.ipc; }; export -f cmdGeth;
 
 
-When used together, (like this : ```cmdROSS theContractYouAreWorkingOnNow.js cmdGeth```), the run-on-save-script executes ```cmdGeth``` once for each change in ```theContractYouAreWorkingOnNow.js```.  As show, it calls ```currentTask()```, but that can be changed by editing the ```cmdGeth``` function in ```~/.profile``` and then reloading it by "sourcing" ```~/.profile```  (like this ```source ~/.profile```).
+When used together, (like this : ```cmdROSS ROSSutils.js cmdGeth```), the run-on-save-script executes ```cmdGeth``` once for each change in ```ROSSutils.js```.  As shown, it calls ```currentTask()```, but ```ROSSutils.js``` & ```currentTask()``` can be changed by editing the ```cmdGeth``` function in ```~/.profile``` and then reloading it by "sourcing" ```~/.profile```  (like this ```source ~/.profile```).
+
+Save a slight alteration to the file ```ROSSutils.js``` and your client node will pay Ξther 1.51 to the coin base of your root node.
+
+
+####  How to filter blocks for specific data
+
+The file ```js/filteringDemo.js``` can be loaded from the geth console, (like this ```loadScript("/home/you/InitializeEthereumPrivateNetwork/js/filteringDemo.js");```).  
+
+The script reports on changes to the block chain.  If a block is mined but has no transactions in it, the script will report :
+
+     ~~ Latest = 0x1e47b7b66b9b3aae6410c00de613d8b8bbace8507e460db7eaa3d508585a2959
+    Pending block transactions : 0. Latest block transactions : 0.
+
+If transactions are found, it will report . . . 
+
+    ***** PENDING = 0x0cd0e039299d5bd55d3ce726984791e7414b265a4061e104eddb1c466ebd04fb
+    Pending block transactions : 1. Latest block transactions : 0.
+    
+. . . and shortly thereafter . . . 
+
+     ~~ Latest = 0x79c989c709c3e64b83985654c980c64416ca9d0626eb8fc01552e8bbba762322
+    Pending block transactions : 0. Latest block transactions : 1.
+    Block number : 631 has 1 transactions.
+    Payment of '1.51' Eth, from '0x7099925771b3c88ada129776e484f8f8f508d6e8' to '0xbe603b2baf9470ff901bcc2e224650a016b150c3'.
