@@ -260,3 +260,19 @@ When that's done it shows a *help* sheet :
 
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     Done.
+
+####  Examples
+
+Two helper functions were added to your user profile : 
+
+```cmdROSS``` is a run-on-save-script.  Whenever there is a change to the file specified in its 1st parameter, it executes the file specified in its 2nd parameter.  Any additional parameters are passed through to the specified excutable file.
+
+    cmdROSS() { /home/you/InitializeEthereumPrivateNetwork/utils/run_on_save.sh $*; }; export -f cmdROSS;
+    
+
+```cmdGeth``` calls ```geth``` passing, as parameters, the file location and network ID you specified when you last executed ```./initializeEthereumTestNode.sh```.  It also excutes the function, ```currentTask()``` from the script ```ROSSutils.js```  pre-loaded from the ```scripts``` sub-directory of the project directory.
+
+    cmdGeth() { geth --datadir /home/you/.dappNet/geth --jspath /home/you/.dappNet/scripts --preload 'ROSSutils.js' --exec 'currentTask()' --networkid 7089 attach ipc://home/you/.dappNet/geth/geth.ipc; }; export -f cmdGeth;
+
+
+When used together, like this ```cmdROSS theContractYouAreWorkingOnNow cmdGeth```
