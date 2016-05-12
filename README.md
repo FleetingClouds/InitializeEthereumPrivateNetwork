@@ -272,14 +272,16 @@ Two helper functions were added to your user profile :
     cmdROSS() { /home/you/InitializeEthereumPrivateNetwork/utils/run_on_save.sh $*; }; export -f cmdROSS;
     
 
-```cmdGeth``` calls ```geth``` passing, as parameters, the file location and network ID you specified when you last executed ```./initializeEthereumTestNode.sh```.  It also excutes the function, ```currentTask()``` from the script ```ROSSutils.js```  pre-loaded from the ```scripts``` sub-directory of the project directory.
+```cmdGeth``` calls ```geth```, passing, as parameters, the file location and network ID you specified when you last executed ```./initializeEthereumTestNode.sh```.  It also excutes the function, ```currentTask()``` from the script ```ROSSutils.js```  pre-loaded from the ```scripts``` sub-directory of the project directory.
 
     cmdGeth() { geth --datadir /home/you/.dappNet/geth --jspath /home/you/.dappNet/scripts --preload 'ROSSutils.js' --exec 'currentTask()' --networkid 7089 attach ipc://home/you/.dappNet/geth/geth.ipc; }; export -f cmdGeth;
 
 
-When used together, (like this : ```cmdROSS ROSSutils.js cmdGeth```), the run-on-save-script executes ```cmdGeth``` once for each change in ```ROSSutils.js```.  As shown, it calls ```currentTask()```, but ```ROSSutils.js``` & ```currentTask()``` can be changed by editing the ```cmdGeth``` function in ```~/.profile``` and then reloading it by "sourcing" ```~/.profile```  (like this ```source ~/.profile```).
+When used together, (like this : ```cmdROSS ROSSutils.js cmdGeth```), the run-on-save-script executes ```cmdGeth``` once for each change in ```ROSSutils.js```.  As shown, it calls ```currentTask()```, but you can substitue  ```ROSSutils.js``` & ```currentTask()``` by editing the ```cmdGeth``` function in ```~/.profile``` and then reloading it by "sourcing" ```~/.profile```  (like this ```source ~/.profile```).
 
-Save a slight alteration to the file ```ROSSutils.js``` and your client node will pay Ξther 1.51 to the coin base of your root node.
+However, ```currentTask()``` does little more load the script ```/home/you/InitializeEthereumPrivateNetwork/js/RunOnSaveScript/rossDemo.js```, then ```rossDemo.js``` loads your Ethereum password from ```/home/you/.ssh/pwdPrimary.js"``` and makes a payment.
+
+In day to day use, saving a slight alteration to the file ```ROSSutils.js``` will cause your client node to pay Ξther 1.51 to the coin base of your root node.
 
 
 ####  How to filter blocks for specific data
