@@ -209,7 +209,7 @@ Typically I do :
          
     Is this correct? (y/n/q) ::  y
   
-Before you start, make sure you have a valid `ssh` key pair in your local (client node) directory ${HOME}/.ssh.
+Before you start, make sure you have a valid `ssh` key pair in your local (client node) directory ${HOME}/.ssh.  (see [Digital Ocean >> How To Set Up SSH Keys](https://www.digitalocean.com/community/tutorials/how-to-set-up-ssh-keys--2)
 
 The script then does these things for you :
 
