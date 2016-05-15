@@ -672,8 +672,8 @@ function addScriptAliasNamesToUserProfile()
 function provideJsonUsageToWeb3()
 {
 
-  wget -P ${WORK_DIR}/scripts/ http://cdnjs.cloudflare.com/ajax/libs/json2/20121008/json2.min.js
-
+  echo -e "\n ~~ Getting Crockford's JSON package ('json2.min.js') into '${WORK_DIR}/scripts/'.";
+  wget -qO json2.min.js -P ${WORK_DIR}/scripts/ http://cdnjs.cloudflare.com/ajax/libs/json2/20121008/json2.min.js
 
 }
 
@@ -739,21 +739,44 @@ if [[ "${NODE_TYPE}" == "${CLIENT_NODE_TYPE}"  ||  "${NODE_TYPE}" == "${ROOT_NOD
 
   mineSomeBlocksIfLowBalance;
 
-  echo "";
-  echo "";
-  echo -e "\n      * * * Setup has Finished * * *  ";
-  echo -e "\n You are ready to start mining. Run the following command : ";
-  echo "";
-  echo geth --datadir "${WORK_DIR}/geth" --verbosity 3 --maxpeers "5" --networkid ${NETWORK_ID} --nodiscover console 2\>\> ${WORK_DIR}/prvWhsmn.log
-  echo "";
-  echo -e "\n ~~ To view accumulated ether, enter      > web3.fromWei(eth.getBalance(eth.accounts[0]), \"ether\") ";
-  echo -e "\n ~~ To continue mining                    > miner.start(2) ";
-  echo -e "\n ~~ Then to pause mining                  > miner.stop() ";
 
   if [[ "${NODE_TYPE}" == "${ROOT_NODE_TYPE}" ]]; then
 
     declare MONITORING_EXAMPLE="MineIfWorkToBeDone.js";
     createTransactionMonitoringExample;
+
+  else
+
+    createSimpleTransactionExample;
+
+    addScriptAliasNamesToUserProfile;
+    createRunOnSaveScriptExample;
+
+    copyContractInstallerExampleScripts;
+    provideJsonUsageToWeb3;
+
+  fi;  
+
+
+  echo "";
+  echo "";
+  echo -e "\n      * * * Setup has Finished * * *  ";
+  echo -e "\n You are ready to start using geth. Run the following command : ";
+  echo "";
+  echo geth --datadir "${WORK_DIR}/geth" --verbosity 3 --maxpeers "5" --networkid ${NETWORK_ID} --nodiscover console 2\>\> ${WORK_DIR}/prvWhsmn.log
+  echo "";
+
+  echo -e "\n ~~ To attach to that same console from another local terminal session, use :";
+  echo geth --datadir "${WORK_DIR}/geth" --networkid ${NETWORK_ID} attach ipc:/${WORK_DIR}/geth/geth.ipc
+  echo "";
+
+  echo -e "\n ~~ To view accumulated ether, enter      > web3.fromWei(eth.getBalance(eth.accounts[0]), \"ether\") ";
+  echo -e "\n ~~ To start mining                       > miner.start(2) ";
+  echo -e "\n ~~ Then to pause mining                  > miner.stop() ";
+
+  if [[ "${NODE_TYPE}" == "${ROOT_NODE_TYPE}" ]]; then
+
+    declare MONITORING_EXAMPLE="MineIfWorkToBeDone.js";
     echo -e "\n ~~ To have your root node process transactions automatically run it with this command . . .";
     echo geth --datadir "${WORK_DIR}/geth" --jspath "${WORK_DIR}/scripts" --preload \"${MONITORING_EXAMPLE}\" --verbosity 3 --maxpeers 5 --networkid ${NETWORK_ID} --nodiscover console 2\>\> ${WORK_DIR}/prvWhsmn.log
     echo -e "    When there are transactions in need of processing you will see . . .  ";
@@ -763,29 +786,24 @@ if [[ "${NODE_TYPE}" == "${CLIENT_NODE_TYPE}"  ||  "${NODE_TYPE}" == "${ROOT_NOD
 
   else
 
-    createSimpleTransactionExample;
     echo -e "\n ~~ To pay to the root node's base acct use these two commands.";
     echo -e "        > personal.unlockAccount(eth.accounts[0], '${ACCOUNT_PASSWORD}');";
     echo -e "        > eth.sendTransaction({from: eth.accounts[0], to: ${PEER_ACCT}, value: web3.toWei(1, \"ether\")})";
 
-
-    addScriptAliasNamesToUserProfile;
-    createRunOnSaveScriptExample;
     echo -e "\n ~~ To test scripts and contracts each time you save editor changes (ross) try this : ";
     echo -e "    $(whoami)@$(hostname):~$ source ~/.profile";
     echo -e "    $(whoami)@$(hostname):~$ cd ${HOME}/${EXAMPLES_DIR}";
     echo -e "    $(whoami)@$(hostname):~/${EXAMPLES_DIR}$ cmdROSS rossDemo.js cmdGeth";
 
-    copyContractInstallerExampleScripts;
-    echo -e "\n ~~ To easily install a contract try this : ";
+    echo -e "\n ~~ To see how to easily install a contract try this : ";
     echo -e "    $(whoami)@$(hostname):~$ source ~/.profile";
     echo -e "    $(whoami)@$(hostname):~$ cd ${HOME}/${EXAMPLES_DIR}";
-    echo -e "    $(whoami)@$(hostname):~/${EXAMPLES_DIR}$ cmdROSS rossDemo.js cmdGeth";
+    echo -e "    $(whoami)@$(hostname):~/${EXAMPLES_DIR}$ ${WORK_DIR}/scripts/generateContractInstallerScript.sh ./Greeter.js greeter";
+    echo -e " ~~ Then in the geth console enter : ";
+    echo -e "        > loadScript(\"/home/you/projects/examples/install_Greeter.js\");";
 
   fi;  
 
-  echo -e "\n ~~ To attach from another local terminal session, use :";
-  echo geth --datadir "${WORK_DIR}/geth" --networkid ${NETWORK_ID} attach ipc:/${WORK_DIR}/geth/geth.ipc
   echo "";
   echo "";
 
