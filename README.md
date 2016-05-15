@@ -5,6 +5,7 @@ Start a basic Ξthereum private network in minutes!
 A script for initializing an Ξthereum private network for testing and development. Also, includes some helper scripts for :
 
  - rerunning ```geth  --preload "aScript.js" attach``` whenever aScript.js changes
+ - filtering blocks for specific changes that interest you
  - preparing and loading contracts
 
 It's written for command line oriented developers, who want to automate for continuous integration and deployment.
@@ -287,7 +288,7 @@ When used together, like this . . .
 
     cmdROSS ROSSutils.js cmdGeth;
 
-. . . the run-on-save-script executes ```cmdGeth``` once for each change in ```ROSSutils.js```.  As shown, it calls ```currentTask()```, but you can substitute  ```ROSSutils.js``` & ```currentTask()``` by editing the ```cmdGeth``` function in ```~/.profile``` and then reloading it by "sourcing" ```~/.profile```  (like this ```source ~/.profile```).
+. . . the run-on-save-script executes ```cmdGeth``` once for each change in ```/home/you/.dappNet/scripts/ROSSutils.js```.  As shown, it calls ```currentTask()```, but you can substitute  ```ROSSutils.js``` & ```currentTask()``` by editing the ```cmdGeth``` function in ```~/.profile``` and then reloading it by "sourcing" ```~/.profile```  (like this ```source ~/.profile```).
 
 However, ```currentTask()``` does little more load the script ```/home/you/InitializeEthereumPrivateNetwork/js/RunOnSaveScript/rossDemo.js```, then ```rossDemo.js``` loads your Ξthereum password from ```/home/you/.ssh/pwdPrimary.js"``` and makes a payment.
 
