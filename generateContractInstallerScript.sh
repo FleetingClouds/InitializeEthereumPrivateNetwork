@@ -54,9 +54,8 @@ function reportContractInstantiation (e, contract) {
       console.log("var adr${theContractEntryPointCapitalized} = '" + contract.address + "';");
       console.log("var abi${theContractEntryPointCapitalized} = " + JSON.stringify(contract.abi) + ";");
       console.log("");
-      console.log("var ${theContractEntryPoint} = eth.contract(abi${theContractEntryPointCapitalized}).at(adr${theContractEntryPointCapitalized});");
-      console.log("");
       console.log("// Usage example :");
+      console.log("var ${theContractEntryPoint} = eth.contract(abi${theContractEntryPointCapitalized}).at(adr${theContractEntryPointCapitalized});");
       console.log("eth.getCode(${theContractEntryPoint}.address);");
       console.log("${theContractEntryPoint}.greet();"); // "
       console.log("");
