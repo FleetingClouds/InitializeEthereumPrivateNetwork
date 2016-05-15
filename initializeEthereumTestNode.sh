@@ -2,7 +2,7 @@
 
 # ############################################################################
 #
-# This bash script will set up a private Ethereum test network.
+# This bash script will set up a private Ξthereum test network.
 #
 # It can do either a "root node" or a "client node".  It will prompt for 
 # initial parameters and then do all the rest of the work for you.
@@ -56,6 +56,9 @@ source ${CURR_DIR}/shellVarDefs.sh
 
 declare PRELOAD_SCRIPT_NAME="ROSSutils.js";
 declare DEMO_SCRIPT_NAME="rossDemo.js";
+
+declare CONTRACT_INSTALLER_SCRIPT_NAME="generateContractInstallerScript.sh";
+declare EXAMPLE_CONTRACT_NAME="Greeter.js";
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #  Specify required shell var definitions by group
@@ -151,7 +154,7 @@ function askUserForNodeType()
 
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-#  installDependencies -- Install Ethereum and related dependencies.
+#  installDependencies -- Install Ξthereum and related dependencies.
 #      ( change "if" statement to speed up for repeat use )
 function installDependencies()
 {
@@ -160,11 +163,12 @@ function installDependencies()
 
     echo " ~~ Installing dependencies . . .";
     sudo apt-get -y install software-properties-common;
-    # # sudo add-apt-repository -y ppa:ethereum/ethereum;
+    sudo add-apt-repository -y ppa:ethereum/ethereum;
     sudo add-apt-repository -y ppa:ethereum/ethereum-dev;
     sudo apt-get update;
     # # sudo apt-get install -y cpp-ethereum;
     sudo apt-get install -y ethereum;
+    sudo apt-get install -y solc;
 
   else
     echo "Skipped dependency installation 'coz done already.";
@@ -583,7 +587,7 @@ function createTransactionMonitoringExample()
 function createRunOnSaveScriptExample()
 {
 
-  echo -e "\n ~~ Copying an example of Run-On-Save-Script (ROSS) usage to ${WORK_DIR}/scripts.";
+  echo -e "\n ~~ Copying an example of Run-On-Save-Script (ROSS) usage to '${WORK_DIR}/scripts'.";
   cp ${CURR_DIR}/js/RunOnSaveScript/${PRELOAD_SCRIPT_NAME} ${WORK_DIR}/scripts;
   cp ${CURR_DIR}/js/RunOnSaveScript/${DEMO_SCRIPT_NAME} ${HOME}/${EXAMPLES_DIR};
   sed -i s/ROOT_PRIMARY_ACCOUNT/${PEER_ACCT}/ ${HOME}/${EXAMPLES_DIR}/${DEMO_SCRIPT_NAME};
@@ -597,13 +601,25 @@ EOPPJS
 };
 
 
+function copyContractInstallerExampleScripts()
+{
+
+  echo -e "\n ~~ Copying a contract installer script '${CONTRACT_INSTALLER_SCRIPT_NAME}' to '${WORK_DIR}/scripts' and . . .";
+  cp ${CURR_DIR}/${CONTRACT_INSTALLER_SCRIPT_NAME} ${WORK_DIR}/scripts;
+
+  echo -e "  . . . copying a sample contract '${EXAMPLE_CONTRACT_NAME}' for installation to '${HOME}/${EXAMPLES_DIR}'.";
+  cp ${CURR_DIR}/js/GreeterContract/${EXAMPLE_CONTRACT_NAME} ${HOME}/${EXAMPLES_DIR};
+
+};
+
+
 function addScriptAliasNamesToUserProfile()
 {
 
   declare START_UP_FILE=${HOME}/.profile;
 
-  declare START_EXPLANATION="### Begin Ethereum Dev Script additions. From https://github.com/FleetingClouds/InitializeEthereumPrivateNetwork";
-  declare END_EXPLANATION="### End Ethereum Dev Script additions.";
+  declare START_EXPLANATION="### Begin Ξthereum Dev Script additions. From https://github.com/FleetingClouds/InitializeEthereumPrivateNetwork";
+  declare END_EXPLANATION="### End Ξthereum Dev Script additions.";
 
   declare aliasRoss="cmdROSS()";
   declare aliasAutoGeth="cmdGeth()";
@@ -628,7 +644,7 @@ function addScriptAliasNamesToUserProfile()
   fi;
 
   if [[ $(cat ${START_UP_FILE} | grep -c "${aliasAutoGeth}") -gt 0 ]]; then
-    echo "Looking for ${newAliasAutoGeth}";
+    # echo "Looking for ${newAliasAutoGeth}";
     if [[ $(cat ${START_UP_FILE} | grep -c "${newAliasAutoGeth}") -lt 1 ]]; then
       sed -i "/${aliasAutoGeth}/c${newAliasAutoGeth}" ${START_UP_FILE};
     fi;
@@ -649,6 +665,16 @@ function addScriptAliasNamesToUserProfile()
     echo "" >> ${START_UP_FILE};
   fi;
 
+
+};
+
+
+function provideJsonUsageToWeb3()
+{
+
+  wget -P ${WORK_DIR}/scripts/ http://cdnjs.cloudflare.com/ajax/libs/json2/20121008/json2.min.js
+
+
 }
 
 # ############################################################################
@@ -659,7 +685,7 @@ function addScriptAliasNamesToUserProfile()
 
 
 echo -e "\n\n";
-echo -e "This 'wizard' makes it easy to set up an Etheruem private network between virtual machines";
+echo -e "This 'wizard' makes it easy to set up an Ξthereum private network between virtual machines";
 echo -e "It's intended as a quick start for developer experimentation";
 
 loadShellVars;
@@ -724,7 +750,18 @@ if [[ "${NODE_TYPE}" == "${CLIENT_NODE_TYPE}"  ||  "${NODE_TYPE}" == "${ROOT_NOD
   echo -e "\n ~~ To continue mining                    > miner.start(2) ";
   echo -e "\n ~~ Then to pause mining                  > miner.stop() ";
 
-  if [[ "${NODE_TYPE}" == "${CLIENT_NODE_TYPE}" ]]; then
+  if [[ "${NODE_TYPE}" == "${ROOT_NODE_TYPE}" ]]; then
+
+    declare MONITORING_EXAMPLE="MineIfWorkToBeDone.js";
+    createTransactionMonitoringExample;
+    echo -e "\n ~~ To have your root node process transactions automatically run it with this command . . .";
+    echo geth --datadir "${WORK_DIR}/geth" --jspath "${WORK_DIR}/scripts" --preload \"${MONITORING_EXAMPLE}\" --verbosity 3 --maxpeers 5 --networkid ${NETWORK_ID} --nodiscover console 2\>\> ${WORK_DIR}/prvWhsmn.log
+    echo -e "    When there are transactions in need of processing you will see . . .  ";
+    echo -e "     * ==  Pending transactions! Mining...  == *    ";
+    echo -e "  . . . and once all transactions have been processed it will report . . .    ";
+    echo -e "     * ==  No transactions! Mining stopped.  == *   ";    
+
+  else
 
     createSimpleTransactionExample;
     echo -e "\n ~~ To pay to the root node's base acct use these two commands.";
@@ -739,16 +776,11 @@ if [[ "${NODE_TYPE}" == "${CLIENT_NODE_TYPE}"  ||  "${NODE_TYPE}" == "${ROOT_NOD
     echo -e "    $(whoami)@$(hostname):~$ cd ${HOME}/${EXAMPLES_DIR}";
     echo -e "    $(whoami)@$(hostname):~/${EXAMPLES_DIR}$ cmdROSS rossDemo.js cmdGeth";
 
-  else
-
-    declare MONITORING_EXAMPLE="MineIfWorkToBeDone.js";
-    createTransactionMonitoringExample;
-    echo -e "\n ~~ To have your root node process transactions automatically run it with this command . . .";
-    echo geth --datadir "${WORK_DIR}/geth" --jspath "${WORK_DIR}/scripts" --preload \"${MONITORING_EXAMPLE}\" --verbosity 3 --maxpeers 5 --networkid ${NETWORK_ID} --nodiscover console 2\>\> ${WORK_DIR}/prvWhsmn.log
-    echo -e "    When there are transactions in need of processing you will see . . .  ";
-    echo -e "     * ==  Pending transactions! Mining...  == *    ";
-    echo -e "  . . . and once all transactions have been processed it will report . . .    ";
-    echo -e "     * ==  No transactions! Mining stopped.  == *   ";    
+    copyContractInstallerExampleScripts;
+    echo -e "\n ~~ To easily install a contract try this : ";
+    echo -e "    $(whoami)@$(hostname):~$ source ~/.profile";
+    echo -e "    $(whoami)@$(hostname):~$ cd ${HOME}/${EXAMPLES_DIR}";
+    echo -e "    $(whoami)@$(hostname):~/${EXAMPLES_DIR}$ cmdROSS rossDemo.js cmdGeth";
 
   fi;  
 
@@ -765,9 +797,9 @@ if [[ "${NODE_TYPE}" == "${CLIENT_NODE_TYPE}"  ||  "${NODE_TYPE}" == "${ROOT_NOD
     echo -e "\n ~~ Client nodes will need these four data elements in order to connect :";
     echo -e "    ~ The IP address of your root node machine                      :: ${LOCAL_IP_ADDR}";
     echo -e "    ~ The directory for geth's working files ON THE ROOT NODE       :: ${PROJECT_DIR}";
-    echo -e "    ~ The Ethereum network ID                                       :: ${NETWORK_ID}";
-    echo -e "    ~ The SSH user name of the root node machine's Ethereum account :: ${USER}";
-    echo -e "    ~ The SSH password of the root node machine's Ethereum account  :: ????????????";
+    echo -e "    ~ The Ξthereum network ID                                       :: ${NETWORK_ID}";
+    echo -e "    ~ The SSH user name of the root node machine's Ξthereum account :: ${USER}";
+    echo -e "    ~ The SSH password of the root node machine's Ξthereum account  :: ????????????";
 
   fi;
 

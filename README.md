@@ -1,8 +1,8 @@
-# Initialize Ethereum Private Network
+# Initialize Ξthereum Private Network
 
-Start a basic Ethereum private network in minutes!
+Start a basic Ξthereum private network in minutes!
 
-A script for initializing an Ethereum private network for testing and development.
+A script for initializing an Ξthereum private network for testing and development.
 
 ### Credit / References
 
@@ -10,7 +10,7 @@ Based on these works :
 
 - [Creating a Private Chain/Testnet](https://souptacular.gitbooks.io/ethereum-tutorials-and-tips-by-hudson/content/)
 - [Setting up private network or local cluster](https://github.com/ethereum/go-ethereum/wiki/Setting-up-private-network-or-local-cluster)
-- [How To Create A Private Ethereum Chain](http://adeduke.com/2015/08/how-to-create-a-private-ethereum-chain/)
+- [How To Create A Private Ξthereum Chain](http://adeduke.com/2015/08/how-to-create-a-private-ethereum-chain/)
 
 ### Prerequisites
 
@@ -125,7 +125,7 @@ When that's done it shows a *help* sheet :
 
      You are ready to start mining. Run the following command : 
 
-    geth --datadir /home/you/.dappNet/geth --verbosity 3 --maxpeers 5 --networkid 7028 --nodiscover console 2>> /home/you/.dappNet/prvWhsmn.log
+    geth --datadir ${ETHEREUM_DIRECTORY}/geth --verbosity 3 --maxpeers 5 --networkid 7028 --nodiscover console 2>> ${ETHEREUM_DIRECTORY}/prvWhsmn.log
 
 
      ~~ To view accumulated ether, enter      > web3.fromWei(eth.getBalance(eth.accounts[0]), "ether") 
@@ -137,22 +137,22 @@ When that's done it shows a *help* sheet :
      ~~ Copying a JavaScript example of transaction monitoring.
 
      ~~ To have your root node process transactions automatically run, it with this command . . .
-    geth --datadir /home/you/.dappNet/geth --jspath /home/you/.dappNet/scripts --preload "MineIfWorkToBeDone.js" --verbosity 3 --maxpeers 5 --networkid 7028 --nodiscover console 2>> /home/you/.dappNet/prvWhsmn.log
+    geth --datadir ${ETHEREUM_DIRECTORY}/geth --jspath ${ETHEREUM_DIRECTORY}/scripts --preload "MineIfWorkToBeDone.js" --verbosity 3 --maxpeers 5 --networkid 7028 --nodiscover console 2>> ${ETHEREUM_DIRECTORY}/prvWhsmn.log
         When there are transactions in need of processing you will see . . .  
          * ==  Pending transactions! Mining...  == *    
       . . . and once all transactions have been processed it will report . . .
          * ==  No transactions! Mining stopped.  == *   
 
      ~~ To attach from another local terminal session, use :
-    geth --datadir /home/you/.dappNet/geth --networkid 7028 attach ipc://home/you/.dappNet/geth/geth.ipc
+    geth --datadir ${ETHEREUM_DIRECTORY}/geth --networkid 7028 attach ipc:/${ETHEREUM_DIRECTORY}/geth/geth.ipc
 
 
 
      ~~ Client nodes will need these four data elements in order to connect :
         ~ The IP address of your root node machine                      :: 192.168.122.142
         ~ The directory for geth's working files ON THE ROOT NODE       :: .dappNet
-        ~ The SSH user name of the root node machine's Ethereum account :: you
-        ~ The SSH password of the root node machine's Ethereum account  :: ????????????
+        ~ The SSH user name of the root node machine's Ξthereum account :: you
+        ~ The SSH password of the root node machine's Ξthereum account  :: ????????????
 
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     Done.
@@ -200,7 +200,7 @@ Typically I do :
     The password to use when creating accounts :: plokplok
     The directory for geth's working files on THIS node :: .dappNet
     The IP address of your root node machine :: 192.168.122.142
-    The SSH user name of the root node machine's Ethereum account :: you
+    The SSH user name of the root node machine's Ξthereum account :: you
     The directory for geth's working files ON THE ROOT NODE :: .dappNet
     Name of the file for the "nodeInfo" of the root node :: nodeInfo.json
     You want to delete the DAG file (y/n) :: n
@@ -232,7 +232,7 @@ When that's done it shows a *help* sheet :
 
      You are ready to start mining. Run the following command : 
 
-    geth --datadir /home/you/.dappNet/geth --verbosity 3 --maxpeers 5 --networkid 7028 --nodiscover console 2>> /home/you/.dappNet/prvWhsmn.log
+    geth --datadir ${ETHEREUM_DIRECTORY}/geth --verbosity 3 --maxpeers 5 --networkid 7028 --nodiscover console 2>> ${ETHEREUM_DIRECTORY}/prvWhsmn.log
 
 
      ~~ To view accumulated ether, enter      > web3.fromWei(eth.getBalance(eth.accounts[0]), "ether") 
@@ -247,7 +247,7 @@ When that's done it shows a *help* sheet :
 
      ~~ Adding script alias names to user profile (/home/you/.profile).
 
-     ~~ Copying an example of Run-On-Save-Script (ROSS) usage to /home/you/.dappNet/scripts.
+     ~~ Copying an example of Run-On-Save-Script (ROSS) usage to ${ETHEREUM_DIRECTORY}/scripts.
 
      ~~ To test scripts and contracts each time you save editor changes (ross) try this : 
         you@brnch1:~$ source ~/.profile
@@ -255,7 +255,7 @@ When that's done it shows a *help* sheet :
         you@brnch1:~/projects/examples$ cmdROSS rossDemo.js cmdGeth
 
      ~~ To attach from another local terminal session, use :
-    geth --datadir /home/you/.dappNet/geth --networkid 7028 attach ipc://home/you/.dappNet/geth/geth.ipc
+    geth --datadir ${ETHEREUM_DIRECTORY}/geth --networkid 7028 attach ipc:/${ETHEREUM_DIRECTORY}/geth/geth.ipc
 
 
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -274,12 +274,12 @@ Two helper functions were added to your user profile :
 
 ```cmdGeth``` calls ```geth```, passing, as parameters, the file location and network ID you specified when you last executed ```./initializeEthereumTestNode.sh```.  It also excutes the function, ```currentTask()``` from the script ```ROSSutils.js```  pre-loaded from the ```scripts``` sub-directory of the project directory.
 
-    cmdGeth() { geth --datadir /home/you/.dappNet/geth --jspath /home/you/.dappNet/scripts --preload 'ROSSutils.js' --exec 'currentTask()' --networkid 7089 attach ipc://home/you/.dappNet/geth/geth.ipc; }; export -f cmdGeth;
+    cmdGeth() { geth --datadir ${ETHEREUM_DIRECTORY}/geth --jspath ${ETHEREUM_DIRECTORY}/scripts --preload 'ROSSutils.js' --exec 'currentTask()' --networkid 7089 attach ipc:/${ETHEREUM_DIRECTORY}/geth/geth.ipc; }; export -f cmdGeth;
 
 
 When used together, (like this : ```cmdROSS ROSSutils.js cmdGeth```), the run-on-save-script executes ```cmdGeth``` once for each change in ```ROSSutils.js```.  As shown, it calls ```currentTask()```, but you can substitue  ```ROSSutils.js``` & ```currentTask()``` by editing the ```cmdGeth``` function in ```~/.profile``` and then reloading it by "sourcing" ```~/.profile```  (like this ```source ~/.profile```).
 
-However, ```currentTask()``` does little more load the script ```/home/you/InitializeEthereumPrivateNetwork/js/RunOnSaveScript/rossDemo.js```, then ```rossDemo.js``` loads your Ethereum password from ```/home/you/.ssh/pwdPrimary.js"``` and makes a payment.
+However, ```currentTask()``` does little more load the script ```/home/you/InitializeEthereumPrivateNetwork/js/RunOnSaveScript/rossDemo.js```, then ```rossDemo.js``` loads your Ξthereum password from ```/home/you/.ssh/pwdPrimary.js"``` and makes a payment.
 
 In day to day use, saving a slight alteration to the file ```ROSSutils.js``` will cause your client node to pay Ξther 1.51 to the coin base of your root node.
 
@@ -304,3 +304,83 @@ If transactions are found, it will report . . .
     Pending block transactions : 0. Latest block transactions : 1.
     Block number : 631 has 1 transactions.
     Payment of '1.51' Eth, from '0x7099925771b3c88ada129776e484f8f8f508d6e8' to '0xbe603b2baf9470ff901bcc2e224650a016b150c3'.
+
+
+####  Contract deployment script
+
+The file ```generateContractInstallerScript.sh``` analyzes a contract file and generates an installer script in Web3 Javascript.  When loaded into the ```geth``` Web3 REPL, the generated script completes deployment into the Ξthereum block chain, and displays the resulting discovery and usage parameters.
+
+**Example : **
+
+*Generate the installer script*
+
+    you@brnch1:~$ cd ~/projects/examples
+    you@brnch1:~$ ${ETHEREUM_DIRECTORY}/scripts/generateContractInstallerScript.sh ./Greeter.js greeter
+
+     ~~ Now creating installer : './install_Greeter.js' for contract 'greeter'
+
+
+*Start up geth and then load the installer script*
+
+    you@brnch1:~$ geth --datadir ${ETHEREUM_DIRECTORY}/geth --networkid ..., etc., etc., etc., etc.,
+    instance: Geth/v1.5.0-unstable/linux/go1.6.1
+    coinbase: 0x9d2d0.........................6281762df2
+    at block: 705 (Sat, 14 May 2016 12:30:56 EDT)
+     datadir: ${ETHEREUM_DIRECTORY}/geth
+    > loadScript("/home/you/projects/examples/install_Greeter.js");
+    _arguments is : YOU WILL HAVE TO DEFINE THE ARGUMENTS YOURSELF
+    Contract deployment transaction has been sent :
+        TransactionHash: 0x94736d68150d807462753bd89d0aa70bf7d51d38c4066a648f0f4ff70e421a46 waiting to be mined...
+    You should see a report on its result within the next few minutes.
+    true
+    > 
+ 
+*Wait until the contract is approved*
+
+    // Contract mined! Has address: 0xb5d10eafaa4a9682a8466b63fe0a176bef09799c
+    // Future users will need these two constants in order to interact with the contract :
+    var adrGreeter = '0xb5d10eafaa4a9682a8466b63fe0a176bef09799c';
+    var abiGreeter = [{"constant":false,"inputs":[],"name":"kill","outputs":[],"type":"function"},{"constant":true,"inputs":[],"name":"greet","outputs":[{"name":"","type":"string"}],"type":"function"},{"inputs":[{"name":"_message","type":"string"}],"type":"constructor"}];
+
+    var greeter = eth.contract(abiGreeter).at(adrGreeter);
+
+    // Usage example :
+    eth.getCode(greeter.address);
+    greeter.greet();
+
+*Connect to a different node, then paste the above instructions into geth*
+
+    you@brnch2:~/.dappNet$ ssh ${NETWORK_ROOT_IP}
+    Welcome to Ubuntu 16.04 LTS (GNU/Linux 4.4.0-22-generic x86_64)
+
+     * Documentation:  https://help.ubuntu.com/
+
+    0 packages can be updated.
+    0 updates are security updates.
+
+    you@root:~$ geth --datadir ${ETHEREUM_DIRECTORY}/geth --networkid ..., etc., etc., etc., etc.,
+    instance: Geth/v1.5.0-unstable/linux/go1.6.1
+    coinbase: 0xbe60..........................a016b150c3
+    at block: 705(Sat, 14 May 2016 13:52:06 EDT)
+     datadir: ${ETHEREUM_DIRECTORY}/geth
+    > var adrGreeter = '0xb5d10eafaa4a9682a8466b63fe0a176bef09799c';
+    undefined
+    > 
+    > {},{"constant":true,"inputs":[],"name":"greet","outputs":[{"name":"","type":"string"}],"type":"function"},{"inputs":[{"name":"_message","type":"string"}],"type":"constructor"}];
+    undefined
+    > 
+    > 
+    > var greeter = eth.contract(abiGreeter).at(adrGreeter);
+    undefined
+    > 
+    > // Usage example :
+    undefined
+    > 
+    > eth.getCode(greeter.address);
+    "0x606060405260e060020a600035046341c0e1b58114610026578063cfae321714610068575b005b6100246000543373ffffffffffffffffffffffffffffffffffffffff908116911614156101375760005473ffffffffffffffffffffffffffffffffffffffff16ff5b6100c9600060609081526001805460a06020601f6002600019610100868816150201909416939093049283018190040281016040526080828152929190828280156101645780601f1061013957610100808354040283529160200191610164565b60405180806020018281038252838181518152602001915080519060200190808383829060006004602084601f0104600f02600301f150905090810190601f1680156101295780820380516001836020036101000a031916815260200191505b509250505060405180910390f35b565b820191906000526020600020905b81548152906001019060200180831161014757829003601f168201915b505050505090509056"
+    > 
+    > greeter.greet();
+    "YOU WILL HAVE TO DEFINE THE ARGUMENTS YOURSELF"
+    > 
+    you@root:~$ 
+

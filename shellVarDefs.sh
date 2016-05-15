@@ -28,7 +28,7 @@ addShellVar 'NETWORK_ROOT_IP' \
             '3';
 
 addShellVar 'NETWORK_ROOT_UID' \
-            "The SSH user name of the root node machine's Ethereum account :: " \
+            "The SSH user name of the root node machine's Ξthereum account :: " \
             'SSH user id of root node : ${NETWORK_ROOT_UID} ' \
             '4';
 
